@@ -1,21 +1,19 @@
-# Python
-__pycache__/
-*.pyc
-
-# Env
+# env
 .env
 
-# Models (LLM)
+# models
 models/
 *.gguf
 
-# Data
+# local data
 data/db/
+data/db_old_1/
 data/new_tickets/
 
-# Logs
-*.log
+# python
+__pycache__/
+*.pyc
 
-# OS / IDE
-.DS_Store
+# ide/os
 .vscode/
+.DS_Store
