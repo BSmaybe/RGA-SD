@@ -15,9 +15,26 @@ def call_ask(api_url: str, issue_text: str, context_count: int, service: str) ->
     if service.strip():
         data["service"] = service.strip()
 
-    r = requests.post(f"{api_url.rstrip('/')}/ask", data=data, timeout=180)
+    r = requests.post(f"{api_url.rstrip('/')}/ask", data=data, timeout=(10, 180))
     r.raise_for_status()
     return r.json()
+
+
+def ensure_api_ready(api_url: str) -> None:
+    """Проверяем доступность API перед отправкой запроса.
+
+    Это позволяет отлавливать ситуацию, когда контейнер ещё не стартовал,
+    PostgreSQL недоступен или API зависает при инициализации, вместо того
+    чтобы ждать таймаута в 180 секунд.
+    """
+
+    url = f"{api_url.rstrip('/')}/readyz"
+    try:
+        requests.get(url, timeout=5).raise_for_status()
+    except requests.RequestException as exc:
+        raise requests.ConnectionError(
+            f"API недоступно по адресу {url}. Убедитесь, что сервис rag-api запущен и готов."
+        ) from exc
 
 
 def call_feedback(
@@ -153,6 +170,7 @@ def main() -> None:
         context_count = int(st.session_state.context_count)
 
         try:
+            ensure_api_ready(api_url)
             with st.spinner("Ищу похожие кейсы и формирую ответ..."):
                 resp = call_ask(api_url=api_url, issue_text=query_text, context_count=context_count, service=service)
         except requests.RequestException as exc:
