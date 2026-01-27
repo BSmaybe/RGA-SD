@@ -54,14 +54,14 @@ services:
     depends_on:
       - api
 
-  ui:
-    build:
-      context: .
-      dockerfile: ui/Dockerfile
-    container_name: rag-ui
-    environment:
-      - API_URL=http://rag-api:8080
-    ports:
-      - "8501:8501"
-    depends_on:
-      - api
+  #ui:
+    #build:
+      #context: .
+      #dockerfile: ui/Dockerfile
+    #container_name: rag-ui
+    #environment:
+      #- API_URL=http://rag-api:8080
+    #ports:
+      #- "8501:8501"
+    #depends_on:
+      #- api
